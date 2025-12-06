@@ -1,31 +1,26 @@
-// DASHBORAD-FROENTEND/src/pages/DashboardPage.tsx
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../utils/api'; // O cliente Axios com o Interceptor JWT
+import api from '../utils/api'; 
 import { useNavigate } from 'react-router-dom';
 
-// Definição simples do tipo de dado de usuário que o Backend retorna
 interface User {
   id: number;
   email: string;
   nome?: string;
 }
 
-const DashboardPage: React.FC = () => {
+  const DashboardPage: React.FC = () => {
   const { logout, token } = useAuth();
   const navigate = useNavigate();
   
-  // Estados para gerenciar os dados e o carregamento
   const [data, setData] = useState<User[] | null>(null);
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 1. Função para buscar dados da rota PROTEGIDA
   useEffect(() => {
     const fetchProtectedData = async () => {
       if (!token) {
-        // Se, por algum motivo, não houver token, pare e force o logout
+
         logout();
         return; 
       }
@@ -34,15 +29,15 @@ const DashboardPage: React.FC = () => {
       setError(null);
       
       try {
-        // A chamada é feita pelo 'api' (Axios), que AUTOMATICAMENTE anexa o JWT!
+
         const response = await api.get('/api/users');
         setData(response.data);
       } catch (err: any) {
         console.error('Erro ao buscar dados protegidos:', err);
-        // Se a API retornar 401 (Token Inválido ou Expirado), forçamos o logout
+
         if (err.response && err.response.status === 401) {
             setError('Sessão expirada. Faça login novamente.');
-            logout(); // Redireciona via PrivateRoute
+            logout(); 
         } else {
             setError('Falha ao carregar dados do Backend.');
         }
@@ -52,12 +47,11 @@ const DashboardPage: React.FC = () => {
     };
 
     fetchProtectedData();
-  }, [token, logout]); // Dependências: Roda sempre que o token mudar ou logout mudar
+  }, [token, logout]); 
 
-  // 2. Função de Logout
   const handleLogout = () => {
     logout();
-    navigate('/login'); // Redireciona após remover o token
+    navigate('/login'); 
   };
 
   return (
